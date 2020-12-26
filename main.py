@@ -2,7 +2,9 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import RMSprop
 import os
+
 print(tf.__version__)
+
 
 def model(args):
     # Define the source directories
@@ -12,7 +14,7 @@ def model(args):
 
     # Rescale images
     train_datagen = ImageDataGenerator(
-        rescale=1.0/255.,
+        rescale=1.0 / 255.,
         rotation_range=40,
         width_shift_range=0.2,
         height_shift_range=0.2,
@@ -23,7 +25,7 @@ def model(args):
     )
 
     test_datagen = ImageDataGenerator(
-        rescale=1.0/255.
+        rescale=1.0 / 255.
     )
 
     # training set
@@ -37,26 +39,22 @@ def model(args):
     # validation set
     validation_gen = test_datagen.flow_from_directory(
         validation_dir,
-        batch_size = args.BATCH_SIZE,
-        class_mode = 'binary',
-        target_size = (150, 150)
+        batch_size=args.BATCH_SIZE,
+        class_mode='binary',
+        target_size=(150, 150)
     )
 
-    model = tf.keras.models.Sequential(
-        [
-            tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(150, 150, 3)),
-            tf.keras.layers.MaxPooling2D(2, 2),
-            tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
-            tf.keras.layers.MaxPooling2D(2, 2),
-            tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-            tf.keras.layers.MaxPooling2D(2, 2),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(512, activation='relu'),
-            tf.keras.layers.Dense(1, activation='sigmoid')
-        ]
-    )
+    # Import model type
+    import model
 
-    print(model.summary())
+    if args.MODEL == "model_1":
+        print("CNN")
+        model = model.model_1()
+        print(model.summary())
+    if args.MODEL == "model_2":
+        print("Inception V3")
+        model = model.model_2()
+        print(model.summary())
 
     model.compile(
         optimizer=RMSprop(lr=0.001),

@@ -27,9 +27,16 @@ def arguments():
         help='Path to training/validation data',
         type=str
     )
+    parser.add_argument(
+        '--model',
+        help='Model to be used.',
+        type=str,
+        default='model_1'
+    )
     args = parser.parse_args()
     args.STEPS_EPOCHS = args.steps_epoch
     args.EPOCHS = args.epochs
+    args.MODEL = args.model
     args.BATCH_SIZE = args.batch_size
     args.DATA_PATH = args.data_path
     return args
