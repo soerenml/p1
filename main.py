@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import RMSprop
 import os
+import time
 
 print(tf.__version__)
 
@@ -62,9 +63,11 @@ def model(args):
         metrics=['accuracy']
     )
 
-    # Tensorboard callback
+    # Save logs for Tensorboard
+    tf_log_dir="/Users/soeren/tf-logs/{}".format(args.RUN_ID)
+    print("Logs saved under: {}".format(tf_log_dir))
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
-        log_dir="/Users/soeren/tf/logs"
+        log_dir=tf_log_dir
     )
 
     # Early stopping callback
@@ -81,6 +84,6 @@ def model(args):
         validation_data=validation_gen,
         steps_per_epoch=args.STEPS_EPOCHS,
         epochs=args.EPOCHS,
-        validation_steps=10,
+        validation_steps=11,
         callbacks=[tensorboard_callback, accuracy_callback]
     )

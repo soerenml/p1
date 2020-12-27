@@ -23,13 +23,19 @@ def model_1():
 
 
 def model_2():
-    local_weights_file = '/Users/soeren/models/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5'
-    # Use the inceptionV3 model architecture
-    # Important: the model is not trained yet! We just got the architecture.
+    """"
+        Returns a retrained Inception V3 model.
+    """
 
-    pre_trained_model = InceptionV3(input_shape=(150, 150, 3),  # define input shape
-                                    include_top=False,  # exclude top layer
-                                    weights=None)  # deactivate default weights
+    # Load local model weights.
+    local_weights_file = '/Users/soeren/models/inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5'
+
+    # Define
+    pre_trained_model = InceptionV3(
+        input_shape=(150, 150, 3),
+        include_top=False,  # exclude top layer
+        weights=None  # deactivate default weights
+    )
 
     # Load weights from already trained model into our InceptionV3
     pre_trained_model.load_weights(local_weights_file)
@@ -38,26 +44,21 @@ def model_2():
     for layer in pre_trained_model.layers:
         layer.trainable = False
 
-    # Summarize the model
+    # Summarize loaded Inception V3
     pre_trained_model.summary()
 
-    # We take the conv. layers mixed7 with (7,7,768)
-    last_layer = pre_trained_model.get_layer('mixed7').output
-
-    # Build the final model
-    # Flatten the output layer to 1 dimension
-    x = tf.keras.layers.Flatten()(last_layer)
-    # Add a fully connected layer with 1,024 hidden units and ReLU activation
+    """ Re-build top layers which are going to re-trained """
+    last_layer = pre_trained_model.get_layer('mixed7').output  # We take the conv. layers mixed7 with (7,7,768).
+    x = tf.keras.layers.Flatten()(last_layer)  # Flatten the output layer to 1 dimension.
     x = tf.keras.layers.Dense(1024, activation='relu')(x)
-    # Add a dropout rate of 0.2
     x = tf.keras.layers.Dropout(0.2)(x)
-    # Add a final sigmoid layer for classification
-    x = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+    x = tf.keras.layers.Dense(1, activation='sigmoid')(x)  # Add a final sigmoid layer for classification.
+    model = tf.keras.Model(pre_trained_model.input, x)  # Combine both parts of the model.
 
-    model = tf.keras.Model(pre_trained_model.input, x)
-
-    model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=0.0001),
-                  loss='binary_crossentropy',
-                  metrics=['accuracy'])
+    model.compile(
+        optimizer=tf.keras.optimizers.RMSprop(lr=0.0001),
+        loss='binary_crossentropy',
+        metrics=['accuracy']
+    )
 
     return model

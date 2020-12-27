@@ -33,12 +33,19 @@ def arguments():
         type=str,
         default='model_1'
     )
+    parser.add_argument(
+        '--run_id',
+        help='ID of the run.',
+        type=str,
+    )
+
     args = parser.parse_args()
     args.STEPS_EPOCHS = args.steps_epoch
     args.EPOCHS = args.epochs
     args.MODEL = args.model
     args.BATCH_SIZE = args.batch_size
     args.DATA_PATH = args.data_path
+    args.RUN_ID = args.run_id
     return args
 
 
